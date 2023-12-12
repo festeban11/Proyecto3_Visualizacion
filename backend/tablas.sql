@@ -1,0 +1,112 @@
+CREATE TABLE transacciones (
+    id INT PRIMARY KEY,
+    usuario VARCHAR(255),
+    fecha DATE,
+    hora TIME,
+    fechahora DATETIME UNIQUE,
+    idconsulta INT,
+    tipoconsulta VARCHAR(255),
+    medico VARCHAR(255),
+    idpaciente INT,
+    prevision VARCHAR(255),
+    iddetalle INT,
+    detalle VARCHAR(255),
+    abono FLOAT,
+    devolucion FLOAT,
+    mpago FLOAT,
+    tbono VARCHAR(255),
+    pagacon VARCHAR(255),
+    isapre VARCHAR(255),
+    numbono VARCHAR(255),
+    voucher VARCHAR(255),
+    numboleta VARCHAR(255),
+    notadecredito INT,
+    monto INT,
+    fechagarantia DATE,
+    estado INT,
+    totalPago INT,
+    totalBonif INT,
+    totalSeg INT,
+    totalCopago INT,
+    numero_mes INT,
+    nombre_mes VARCHAR(255),
+    trimestre INT,
+    semestre INT,
+    FOREIGN KEY (usuario) REFERENCES cajeros(rut_cajero),
+    FOREIGN KEY (medico) REFERENCES medicos(rut_medico)
+);
+
+CREATE TABLE medicos (
+    rut_medico VARCHAR(255) PRIMARY KEY,
+    nombre_medico VARCHAR(255)
+);
+
+CREATE TABLE cajeros (
+    rut_cajero VARCHAR(255) PRIMARY KEY,
+    nombre_cajero VARCHAR(255)
+)
+
+INSERT INTO
+    medicos (rut_medico, nombre_medico)
+VALUES
+    ('20.906.416-2', 'Dr. Andrade'),
+    ('29.287.968-7', 'Dr. Astudillo'),
+    ('25.699.709-6', 'Dr. Bermudez'),
+    ('23.169.766-7', 'Dr. Bravo'),
+    ('28.702.097-K', 'Dr. Campos'),
+    ('14.804.068-0', 'Dr. Catalán'),
+    ('17.817.867-9', 'Dr. Cofré'),
+    ('13.659.803-1', 'Dr. González'),
+    ('29.824.246-K', 'Dr. Gutierrez'),
+    ('26.810.357-0', 'Dr. Migueles'),
+    ('15.106.838-6', 'Dr. Paredes'),
+    ('12.730.867-5', 'Dr. Pérez'),
+    ('10.996.768-8', 'Dr. Pinares'),
+    ('9.848.547-3', 'Dr. Quinteros'),
+    ('28.020.669-5', 'Dr. Reyes'),
+    ('7.790.162-0', 'Dr. Riquelme'),
+    ('28.643.098-8', 'Dr. Saavedra'),
+    ('14.909.140-8', 'Dr. Sepúlveda'),
+    ('15.234.857-6', 'Dr. Solis'),
+    ('10.160.327-K', 'Dra. Fuenzalida'),
+    ('10.726.584-8', 'Dra. Garrido'),
+    ('18.714.609-7', 'Dra. Iturra'),
+    ('25.966.026-2', 'Dra. Jimenez'),
+    ('22.469.679-5', 'Dra. Marabolí'),
+    ('28.784.261-9', 'Dra. Martinez'),
+    ('15.996.317-9', 'Dra. Mora'),
+    ('12.802.743-5', 'Dra. Moreno'),
+    ('11.049.550-1', 'Dra. Pino'),
+    ('19.810.330-6', 'Dra. Rojas'),
+    ('10.106.652-5', 'Dra. Rojas C.'),
+    ('20.686.736-1', 'Dra. Silva'),
+    ('28.425.453-8', 'Dra. Sura'),
+    ('28.975.218-8', 'Dra. Urrutia'),
+    ('00.000.000-0', 'Venta de Insumos');
+
+INSERT INTO
+    cajeros (rut_cajero, nombre_cajero)
+VALUES
+    ('16.002.229-9', 'Andrea'),
+    ('17.463.341-K', 'Camila'),
+    ('18.111.411-8', 'Carla'),
+    ('18.566.740-5', 'Carlos'),
+    ('19.704.745-3', 'Carolina'),
+    ('17.171.439-7', 'Estefany'),
+    ('19.701.879-8', 'Felipe'),
+    ('19.720.176-2', 'Joaquin'),
+    ('16.437.995-7', 'Karen'),
+    ('16.382.783-2', 'Lorena'),
+    ('16.849.681-8', 'Lucia'),
+    ('17.043.304-1', 'Mariana'),
+    ('18.761.394-9', 'Marisol'),
+    ('16.788.017-7', 'Osvaldo'),
+    ('16.102.698-0', 'Pablo'),
+    ('18.395.142-4', 'Paola'),
+    ('16.749.186-3', 'Patricia'),
+    ('19.228.639-5', 'Roberto'),
+    ('17.566.748-2', 'Rodrigo'),
+    ('19.744.288-3', 'Sandra'),
+    ('16.296.493-3', 'Sebastian'),
+    ('19.645.579-5', 'Tamara'),
+    ('18.188.667-6', 'Victor');
