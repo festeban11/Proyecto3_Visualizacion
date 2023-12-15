@@ -36,6 +36,7 @@ class TransactionCreate(BaseModel):
     nombre_mes: str
     trimestre: int
     semestre: int
+    anio: int
 
 
 class Transaction(TransactionCreate):

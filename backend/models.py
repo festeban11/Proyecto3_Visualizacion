@@ -17,7 +17,6 @@ from datetime import datetime
 # Importamos desde database.py la clase Base
 from database import Base
 
-
 class Transaction(Base):
     __tablename__ = "transacciones"
     id = Column(Integer, primary_key=True, index=True)
@@ -57,6 +56,10 @@ class Transaction(Base):
     nombre_mes = Column(String(255))
     trimestre = Column(Integer)
     semestre = Column(Integer)
+    anio = Column(Integer)
+    
+    medico_rel = relationship("Medicos", backref="transacciones")
+    cajero_rel = relationship("Cajeros", backref="transacciones")
 
 
 class Cajeros(Base):

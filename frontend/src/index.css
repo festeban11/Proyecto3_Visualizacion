@@ -4,16 +4,11 @@
   box-sizing: border-box;
 }
 
-.wrapper{
+.container{
   width: 100%;
   max-width: 1200px;
   margin: auto;
-  overflow-x: hidden;
   padding: 20px;
-}
-
-.custom-form{
-  width: 500px;
 }
 
 .btn{
@@ -24,7 +19,12 @@
   width: 100%;
   background-color: #e4e4e4;
   padding: 20px;
+  margin: auto;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.center{
+  text-align: center;
 }
