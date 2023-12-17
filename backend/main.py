@@ -46,15 +46,14 @@ async def upload_data(file: UploadFile = File(...), db: Session = Depends(get_db
         df_processed = process_data(df)
         transactions_list = df_processed.to_dict(orient="records")
         if crud.create_transactions_bulk(db, transactions_list):
-            print("Operación exitosa")
+            return {"status": "success", "message": "Datos cargados correctamente"}
         else:
-            print("Hubo un error durante la operación")
+            return {"status": "error", "message": "Error al cargar los datos"}
 
-    except Exception as e:
-        print(f"Error processing file: {str(e)}")
-        return {"status": "failed", "error_message": str(e)}
+    except:
+        return {"status": "error", "message": "Error al cargar los datos"}
 
-
+#Preprocesamiento y/o transformacion
 def process_data(df):
     # Extraer el mes de la fecha y agregarlo como columna
     df["numero_mes"] = df["fecha"].dt.month
@@ -82,6 +81,7 @@ def process_data(df):
     # Agregar una columna con el trimestre
     df["trimestre"] = df["fecha"].dt.quarter
 
+    # Agregar una columna con el año
     df["anio"] = df["fecha"].dt.year
 
     # Convertir a entero los valores de las columnas idconsulta e idpaciente
@@ -89,8 +89,12 @@ def process_data(df):
     df["idpaciente"] = df["idpaciente"].fillna(0)
     df["idconsulta"] = df["idconsulta"].astype(int)
     df["idpaciente"] = df["idpaciente"].astype(int)
+
+    #Convertir a fecha la columna fechagarantia
     df["fechagarantia"] = pd.to_datetime(df["fechagarantia"], errors="coerce")
     columna_excluida = df["fechagarantia"]
+
+    #Rellenar los valores nulos del resto de columnas con 0
     df_sin_columna_fechagarantia = df.drop(columns=["fechagarantia"]).apply(
         lambda x: x.fillna(0)
     )
@@ -147,8 +151,9 @@ def get_transactions_particulares_doc(db: Session = Depends(get_db)):
 def get_atentions(db: Session = Depends(get_db)):
     query_result = crud.get_atentions(db)
     df = pd.read_sql(query_result.statement, con=engine)
-    df_atentions = df.groupby(["nombre_mes", "semestre", "anio"])["nombre_mes"].count()
+    df_atentions = df.groupby(["nombre_mes",'numero_mes', "semestre", "anio"])["nombre_mes"].count()
     df_atentions = df_atentions.reset_index(name="conteo")
+    df_atentions = df_atentions.sort_values(by=['numero_mes'])
     return df_atentions.to_dict(orient="records")
 
 
@@ -157,11 +162,13 @@ def get_transactions_particulares_fonasa(db: Session = Depends(get_db)):
     query_result = crud.get_transactions_particulares_fonasa(db)
     df = pd.read_sql(query_result.statement, con=engine)
     df_transactions_particulares_fonasa = df.groupby(
-        ["prevision", "semestre", "nombre_mes", "anio"]
+        ["prevision", "semestre", "nombre_mes", "numero_mes", "anio"]
     )["nombre_mes"].count()
     df_transactions_particulares_fonasa = (
         df_transactions_particulares_fonasa.reset_index(name="conteo")
     )
+    df_transactions_particulares_fonasa = df_transactions_particulares_fonasa.sort_values(by=['numero_mes'])
+
     return df_transactions_particulares_fonasa.to_dict(orient="records")
 
 
@@ -177,6 +184,7 @@ def get_venta_insumos(db: Session = Depends(get_db)):
 def get_atentions_by_doc(db: Session = Depends(get_db)):
     query_result = crud.get_atentions(db)
     df = pd.read_sql(query_result.statement, con=engine)
-    df_atentions = df.groupby(["medico","nombre_medico","semestre","trimestre","nombre_mes","anio"])["idpaciente"].count()
+    df_atentions = df.groupby(["medico","nombre_medico","semestre","trimestre","nombre_mes","numero_mes","anio"])["idpaciente"].count()
     df_atentions = df_atentions.reset_index(name="conteo")
+    df_atentions = df_atentions.sort_values(by=['numero_mes'])
     return df_atentions.to_dict(orient="records")

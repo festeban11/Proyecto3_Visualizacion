@@ -8,10 +8,8 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Select from 'react-select'
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
-
-
-
 import Plot from 'react-plotly.js';
+import Swal from 'sweetalert2'
 function App() {
 
   const [excelFile, setExcelFile] = useState(null);
@@ -44,7 +42,8 @@ function App() {
 
   const [selectedMesAtencion, setSelectedMesAtencion] = useState('');
   const [selectedSemestreAtencion, setSelectedSemestreAtencion] = useState(0);
-  const [selectedAnnioAtencion, setSelectedAnnioAtencion] = useState(0);
+  const [selectedAnnioAtencion, setSelectedAnnioAtencion] = useState(2021);
+  const [selectedTrimestreAtencion, setSelectedTrimestreAtencion] = useState(0);
 
   const [selectedPrevision, setSelectedPrevision] = useState('');
   const [selectedMesPrevision, setSelectedMesPrevision] = useState('');
@@ -89,8 +88,13 @@ function App() {
         body: formData,
       })
         .then((res) => res.json())
-        .then((data) => console.log(data))
-        .catch((err) => console.error(err));
+        .then((data) => {
+          Swal.fire({
+            title: data.message,
+            icon: data.status,
+            confirmButtonText: 'OK'
+          })
+        })
     };
   }
 
@@ -123,7 +127,6 @@ function App() {
 
   const atentionDataFiltered = atentionData.filter(item => {
     return (
-      (!selectedMesAtencion || item.nombre_mes === selectedMesAtencion) &&
       (!selectedSemestreAtencion || item.semestre === parseInt(selectedSemestreAtencion)) &&
       (!selectedAnnioAtencion || item.anio === parseInt(selectedAnnioAtencion))
     );
@@ -142,7 +145,7 @@ function App() {
   const atentionsByMedicFiltered = atentionsByMedic.filter(item => {
     return (
       (!selectedSemestreAtencionMedico || item.semestre === parseInt(selectedSemestreAtencionMedico)) &&
-      (!selectedMesAtencionMedico || item.nombre_mes === selectedMesAtencionMedico) &&
+      (!selectedTrimestreAtencionMedico || item.trimestre === parseInt(selectedTrimestreAtencionMedico)) &&
       (!selectedAnnioAtencionMedico || item.anio === parseInt(selectedAnnioAtencionMedico))
     );
   }
@@ -340,7 +343,11 @@ function App() {
                     orientation: 'h'
                   },
                 ]}
-                layout={{ width: 720, height: 720, title: 'Montos recaudados por médico' }}
+                layout={{
+                  width: 720, height: 720, title: 'Montos recaudados por médico', margin: {
+                    l: 150,
+                  },
+}}
               />)}
             </div>
           </div>
@@ -380,7 +387,11 @@ function App() {
                     classNamePrefix="select"
                     onChange={(e) => {
                       if (e.length > 4) {
-                        alert("Solo puede seleccionar hasta 4 cajeros");
+                        Swal.fire({ 
+                          title: 'Solo puede seleccionar hasta 4 cajeros',
+                          icon: 'warning',
+                          confirmButtonText: 'OK'
+                        })
                         e.pop();
                       }
                       else {
@@ -449,7 +460,11 @@ function App() {
                     classNamePrefix="select"
                     onChange={(e) => {
                       if (e.length > 4) {
-                        alert("Solo puede seleccionar hasta 4 medicos");
+                        Swal.fire({ 
+                          title: 'Solo puede seleccionar hasta 4 médicos',
+                          icon: 'warning',
+                          confirmButtonText: 'OK'
+                        })
                         e.pop();
                       }
                       else {
@@ -466,24 +481,33 @@ function App() {
               {transactionsParticularesMedicos && (<Plot
                 data={[
                   {
-                    x: transactionsParticularesMedicosFiltered.map(item => item.nombre_medico),
-                    y: transactionsParticularesMedicosFiltered.map(item => item.monto_sum),
+                    y: transactionsParticularesMedicosFiltered.map(item => item.nombre_medico),
+                    x: transactionsParticularesMedicosFiltered.map(item => item.monto_sum),
                     type: 'bar',
-                    name: "Monto"
+                    name: "Monto",
+                    orientation: 'h'
+
 
                   }
                 ]}
-                layout={{ width: 720, height: 440, title: 'Cantidad de pagos particulares por médicos' }}
+                layout={{ width: 720, height: 720, title: 'Cantidad de pagos particulares por médicos',
+                margin: {
+                  l: 150, // Ajusta este valor según sea necesario
+                }, }}
               />)}
               {transactionsParticularesMedicos && (<Plot
                 data={[
                   {
-                    x: transactionsParticularesMedicosFiltered.map(item => item.nombre_medico),
-                    y: transactionsParticularesMedicosFiltered.map(item => item.conteo),
+                    y: transactionsParticularesMedicosFiltered.map(item => item.nombre_medico),
+                    x: transactionsParticularesMedicosFiltered.map(item => item.conteo),
                     type: 'bar', // Puedes cambiar a 'scatter' u otro tipo según tus necesidades
+                    orientation: 'h',
                   },
                 ]}
-                layout={{ width: 720, height: 440, title: 'Montos partic totales por médicos' }}
+                layout={{ width: 720, height: 720, title: 'Montos particulares totales por médicos',
+                margin: {
+                  l: 150, // Ajusta este valor según sea necesario
+                }, }}
               />)}
             </div>
           </div>
@@ -493,23 +517,7 @@ function App() {
             <form>
               <Container>
                 <Stack direction="horizontal" gap={3} >
-                  <FloatingLabel controlId="floatingSelect" label="Mes">
-                    <Form.Select select value={selectedMesAtencion} onChange={(e) => setSelectedMesAtencion(e.target.value)}>
-                      <option value="">Seleccione un mes</option>
-                      <option value="enero">Enero</option>
-                      <option value="febrero">Febrero</option>
-                      <option value="marzo">Marzo</option>
-                      <option value="abril">Abril</option>
-                      <option value="mayo">Mayo</option>
-                      <option value="junio">Junio</option>
-                      <option value="julio">Julio</option>
-                      <option value="agosto">Agosto</option>
-                      <option value="septiembre">Septiembre</option>
-                      <option value="octubre">Octubre</option>
-                      <option value="noviembre">Noviembre</option>
-                      <option value="diciembre">Diciembre</option>
-                    </Form.Select>
-                  </FloatingLabel>
+                 
                   <FloatingLabel controlId="floatingSelect" label="Semestre">
                     <Form.Select select value={selectedSemestreAtencion} onChange={(e) => setSelectedSemestreAtencion(e.target.value)}>
                       <option value="">Seleccione un semestre</option>
@@ -518,8 +526,11 @@ function App() {
                     </Form.Select>
                   </FloatingLabel>
                   <FloatingLabel controlId="floatingSelect" label="Año">
-                    <Form.Select select value={selectedAnnioAtencion} onChange={(e) => setSelectedAnnioAtencion(e.target.value)}>
-                      <option value="2021">2021</option>
+                    <Form.Select
+                      value={selectedAnnioAtencion}
+                      onChange={(e) => setSelectedAnnioAtencion(e.target.value)}
+                    >
+                      <option value="2021" select>2021</option>
                       <option value="2022">2022</option>
                       <option value="2023">2023</option>
                     </Form.Select>
@@ -661,21 +672,13 @@ function App() {
                 <option value="2">2</option>
               </Form.Select>
               </FloatingLabel>
-              <FloatingLabel controlId="floatingSelect" label="Mes">
-              <Form.Select select value={selectedMesAtencionMedico} onChange={(e) => setSelectedMesAtencionMedico(e.target.value)}>
-                <option value="">Seleccione un mes</option>
-                <option value="enero">Enero</option>
-                <option value="febrero">Febrero</option>
-                <option value="marzo">Marzo</option>
-                <option value="abril">Abril</option>
-                <option value="mayo">Mayo</option>
-                <option value="junio">Junio</option>
-                <option value="julio">Julio</option>
-                <option value="agosto">Agosto</option>
-                <option value="septiembre">Septiembre</option>
-                <option value="octubre">Octubre</option>
-                <option value="noviembre">Noviembre</option>
-                <option value="diciembre">Diciembre</option>
+              <FloatingLabel controlId="floatingSelect" label="Trimestre">
+              <Form.Select select value={selectedTrimestreAtencionMedico} onChange={(e) => setSelectedTrimestreAtencionMedico(e.target.value)}>
+                <option value="">Seleccione un trimestre</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option> 
               </Form.Select>
               </FloatingLabel>
               <FloatingLabel controlId="floatingSelect" label="Año">
@@ -693,13 +696,17 @@ function App() {
               {atentionsByMedic && (<Plot
                 data={[
                   {
-                    x: atentionsByMedicFiltered.map(item => item.nombre_medico),
+                    y: atentionsByMedicFiltered.map(item => item.nombre_medico),
                     z: atentionsByMedicFiltered.map(item => item.conteo),
-                    y: atentionsByMedicFiltered.map(item => item.nombre_mes),
+                    x: atentionsByMedicFiltered.map(item => item.nombre_mes),
                     type: 'heatmap',
+                    
                   },
                 ]}
-                layout={{ width: 720, height: 440, title: 'Cantidad de Atenciones por médico' }}
+                layout={{
+                  width: 720, height: 600, title: 'Cantidad de Atenciones por médico', margin: {
+                    l: 150, // Ajusta este valor según sea necesario
+                  }, }}
               />)}
             </div>
           </div>
